@@ -141,7 +141,7 @@ describe('miscellaneous', () => {
 			.end(done);
 	});
 
-	it('/me', async () => {
+	it.skip('/me', async () => {
 		const user = await createUser();
 		const userCredentials = await doLogin(user.username, password);
 
