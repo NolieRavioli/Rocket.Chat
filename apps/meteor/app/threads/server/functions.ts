@@ -40,10 +40,7 @@ export async function reply({ tmid }: { tmid?: string }, message: IMessage, pare
 	// Notify message mentioned users and highlights
 	const mentionedUsers = [...new Set([...mentionIds, ...highlightsUids])];
 
-	const promises = [
-		ReadReceipts.setAsThreadById(tmid),
-		Subscriptions.addUnreadThreadByRoomIdAndUserIds(rid, threadFollowersUids, tmid, notifyOptions),
-	];
+	const promises = [Subscriptions.addUnreadThreadByRoomIdAndUserIds(rid, threadFollowersUids, tmid, notifyOptions)];
 
 	if (mentionedUsers.length) {
 		promises.push(Subscriptions.addUnreadThreadByRoomIdAndUserIds(rid, mentionedUsers, tmid, { userMention: true }));

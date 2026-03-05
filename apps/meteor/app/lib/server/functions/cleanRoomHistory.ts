@@ -143,13 +143,7 @@ export async function cleanRoomHistory({
 		selectedMessageIds,
 	);
 
-	if (!limit) {
-		const uids = await Users.findByUsernames(fromUsers, { projection: { _id: 1 } })
-			.map((user) => user._id)
-			.toArray();
-		await ReadReceipts.removeByIdPinnedTimestampLimitAndUsers(rid, excludePinned, ignoreDiscussion, ts, uids, ignoreThreads);
-		await ReadReceiptsArchive.removeByIdPinnedTimestampLimitAndUsers(rid, excludePinned, ignoreDiscussion, ts, uids, ignoreThreads);
-	} else if (selectedMessageIds) {
+	if (limit && selectedMessageIds) {
 		await ReadReceipts.removeByMessageIds(selectedMessageIds);
 		await ReadReceiptsArchive.removeByMessageIds(selectedMessageIds);
 	}

@@ -82,14 +82,12 @@ class ReadReceiptClass {
 			}
 		}
 
-		const extraData = roomCoordinator.getRoomDirectives(t).getReadReceiptsExtraData(message);
 		void this.storeReadReceipts(
 			() => {
 				return Promise.resolve([message]);
 			},
 			roomId,
 			userId,
-			extraData,
 		);
 	}
 
@@ -118,7 +116,6 @@ class ReadReceiptClass {
 		getMessages: () => Promise<Pick<IMessage, '_id' | 't' | 'pinned' | 'drid' | 'tmid'>[]>,
 		roomId: string,
 		userId: string,
-		extraData: Partial<IReadReceipt> = {},
 	) {
 		if (settings.get('Message_Read_Receipt_Store_Users')) {
 			const ts = new Date();
@@ -128,11 +125,6 @@ class ReadReceiptClass {
 				userId,
 				messageId: message._id,
 				ts,
-				...(message.t && { t: message.t }),
-				...(message.pinned && { pinned: true }),
-				...(message.drid && { drid: message.drid }),
-				...(message.tmid && { tmid: message.tmid }),
-				...extraData,
 			}));
 
 			if (receipts.length === 0) {
