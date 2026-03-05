@@ -1,3 +1,5 @@
+import { type RequiredField } from '@rocket.chat/core-typings';
+
 export type PushOptions = {
 	sendTimeout?: number;
 	production?: boolean;
@@ -17,10 +19,10 @@ export type PushOptions = {
 	getAuthorization?: () => Promise<string>;
 };
 
-export type PendingPushNotification = {
-	from: string;
-	title: string;
-	text: string;
+export type BasePendingPushNotification = {
+	from?: string;
+	title?: string;
+	text?: string;
 	badge?: number;
 	sound?: string;
 	notId?: number;
@@ -42,4 +44,11 @@ export type PendingPushNotification = {
 	priority?: number;
 
 	contentAvailable?: 1 | 0;
+	voip?: boolean;
 };
+
+export type PendingMessagePushNotification = RequiredField<BasePendingPushNotification, 'from' | 'title' | 'text'> & { voip?: false };
+
+export type PendingVoipPushNotification = BasePendingPushNotification & { voip: true };
+
+export type PendingPushNotification = PendingMessagePushNotification | PendingVoipPushNotification;

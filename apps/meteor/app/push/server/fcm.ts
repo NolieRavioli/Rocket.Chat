@@ -138,15 +138,9 @@ function getFCMMessagesFromPushData(userTokens: string[], notification: PendingP
 		data['content-available'] = notification.contentAvailable.toString();
 	}
 
-	// then we will create the notification field
-	const notificationField: FCMNotificationField = {
-		title: notification.title,
-		body: notification.text,
-	};
-
 	// then we will create the message
 	const message: FCMMessage = {
-		notification: notificationField,
+		...(!notification.voip && { notification: { title: notification.title, body: notification.text } }),
 		data,
 		android: {
 			priority: 'HIGH',
@@ -185,7 +179,7 @@ export const sendFCM = function ({ userTokens, notification, _removeToken, optio
 
 		const removeToken = () => {
 			const { token } = fcmRequest.message;
-			token && _removeToken({ gcm: token });
+			token && _removeToken(token);
 		};
 
 		const response = fetchWithRetry(url, removeToken, {
