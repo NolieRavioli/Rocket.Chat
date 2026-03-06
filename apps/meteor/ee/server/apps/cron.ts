@@ -4,6 +4,7 @@ import { cronJobs } from '@rocket.chat/cron';
 import { Settings, Users } from '@rocket.chat/models';
 
 import { Apps } from './orchestrator';
+import { isCloudDisabled } from '../../../app/cloud/server/isCloudDisabled';
 import { getWorkspaceAccessToken } from '../../../app/cloud/server';
 import { i18n } from '../../../server/lib/i18n';
 import { sendMessagesToAdmins } from '../../../server/lib/sendMessagesToAdmins';
@@ -108,4 +109,12 @@ const appsUpdateMarketplaceInfo = async function _appsUpdateMarketplaceInfo() {
 	await Apps.updateAppsMarketplaceInfo(data).then(notifyAdminsAboutInvalidApps).then(notifyAdminsAboutRenewedApps);
 };
 
-await cronJobs.add('Apps-Engine:check', '0 4 * * *', async () => appsUpdateMarketplaceInfo());
+const jobName = 'Apps-Engine:check';
+
+if (await cronJobs.has(jobName)) {
+	await cronJobs.remove(jobName);
+}
+
+if (!isCloudDisabled()) {
+	await cronJobs.add(jobName, '0 4 * * *', async () => appsUpdateMarketplaceInfo());
+}

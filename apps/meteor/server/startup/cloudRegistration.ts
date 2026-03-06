@@ -1,6 +1,12 @@
 import { Settings } from '@rocket.chat/models';
 
+import { isCloudDisabled } from '../../app/cloud/server/isCloudDisabled';
+
 export async function ensureCloudWorkspaceRegistered(): Promise<void> {
+	if (isCloudDisabled()) {
+		return;
+	}
+
 	const cloudWorkspaceClientId = await Settings.getValueById('Cloud_Workspace_Client_Id');
 	const cloudWorkspaceClientSecret = await Settings.getValueById('Cloud_Workspace_Client_Secret');
 	const showSetupWizard = await Settings.getValueById('Show_Setup_Wizard');

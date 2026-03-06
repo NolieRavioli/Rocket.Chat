@@ -1,5 +1,6 @@
 import { type ExtendedFetchOptions, Response, serverFetch } from '@rocket.chat/server-fetch';
 
+import { isCloudDisabled } from '../../../../app/cloud/server/isCloudDisabled';
 import { isTesting } from './isTesting';
 
 export class MarketplaceAPIClient {
@@ -10,11 +11,13 @@ export class MarketplaceAPIClient {
 	constructor() {
 		if (typeof process.env.OVERWRITE_INTERNAL_MARKETPLACE_URL === 'string' && process.env.OVERWRITE_INTERNAL_MARKETPLACE_URL !== '') {
 			this.#marketplaceUrl = process.env.OVERWRITE_INTERNAL_MARKETPLACE_URL;
+		} else if (isCloudDisabled()) {
+			this.#marketplaceUrl = 'https://marketplace.invalid';
 		} else {
 			this.#marketplaceUrl = 'https://marketplace.rocket.chat';
 		}
 
-		if (isTesting()) {
+		if (isTesting() || isCloudDisabled()) {
 			this.#fetchStrategy = mockMarketplaceFetch;
 		} else {
 			this.#fetchStrategy = serverFetch;

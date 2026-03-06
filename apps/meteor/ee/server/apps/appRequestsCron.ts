@@ -3,6 +3,7 @@ import type { ExtendedFetchOptions } from '@rocket.chat/server-fetch';
 
 import { appRequestNotififyForUsers } from './marketplace/appRequestNotifyUsers';
 import { Apps } from './orchestrator';
+import { isCloudDisabled } from '../../../app/cloud/server/isCloudDisabled';
 import { getWorkspaceAccessToken } from '../../../app/cloud/server';
 import { settings } from '../../../app/settings/server';
 
@@ -60,4 +61,12 @@ const appsNotifyAppRequests = async function _appsNotifyAppRequests() {
 	}
 };
 
-await cronJobs.add('Apps-Request-End-Users:notify', '0 */12 * * *', async () => appsNotifyAppRequests());
+const jobName = 'Apps-Request-End-Users:notify';
+
+if (await cronJobs.has(jobName)) {
+	await cronJobs.remove(jobName);
+}
+
+if (!isCloudDisabled()) {
+	await cronJobs.add(jobName, '0 */12 * * *', async () => appsNotifyAppRequests());
+}

@@ -6,12 +6,18 @@ import { CloudWorkspaceAccessTokenEmptyError, getWorkspaceAccessToken } from './
 import { getWorkspaceAccessTokenWithScope } from './functions/getWorkspaceAccessTokenWithScope';
 import { retrieveRegistrationStatus } from './functions/retrieveRegistrationStatus';
 import { syncWorkspace } from './functions/syncWorkspace';
+import { isCloudDisabled } from './isCloudDisabled';
 import { SystemLogger } from '../../../server/lib/logger/system';
 import './methods';
 
 const licenseCronName = 'Cloud Workspace Sync';
 
 Meteor.startup(async () => {
+	if (isCloudDisabled()) {
+		SystemLogger.info('Cloud services disabled via RC_CLOUD_DISABLED');
+		return;
+	}
+
 	const { workspaceRegistered } = await retrieveRegistrationStatus();
 
 	if (process.env.REG_TOKEN && process.env.REG_TOKEN !== '' && !workspaceRegistered) {

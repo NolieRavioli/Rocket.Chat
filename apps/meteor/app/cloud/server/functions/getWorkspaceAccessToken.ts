@@ -2,6 +2,7 @@ import type { IWorkspaceCredentials } from '@rocket.chat/core-typings';
 import { WorkspaceCredentials } from '@rocket.chat/models';
 
 import { SystemLogger } from '../../../../server/lib/logger/system';
+import { isCloudDisabled } from '../isCloudDisabled';
 import { workspaceScopes } from '../oauthScopes';
 import { getWorkspaceAccessTokenWithScope } from './getWorkspaceAccessTokenWithScope';
 import { retrieveRegistrationStatus } from './retrieveRegistrationStatus';
@@ -20,6 +21,10 @@ const hasWorkspaceAccessTokenExpired = (credentials: IWorkspaceCredentials): boo
  * @returns string - A valid access token for the workspace
  */
 export async function getWorkspaceAccessToken(forceNew = false, scope = '', save = true, throwOnError = false): Promise<string> {
+	if (isCloudDisabled()) {
+		return '';
+	}
+
 	const { workspaceRegistered } = await retrieveRegistrationStatus();
 
 	if (!workspaceRegistered) {

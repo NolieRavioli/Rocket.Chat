@@ -1,6 +1,7 @@
 import { serverFetch as fetch } from '@rocket.chat/server-fetch';
 
 import { SystemLogger } from '../../../../server/lib/logger/system';
+import { isCloudDisabled } from '../isCloudDisabled';
 import { settings } from '../../../settings/server';
 import { workspaceScopes } from '../oauthScopes';
 import { getRedirectUri } from './getRedirectUri';
@@ -23,9 +24,13 @@ export async function getWorkspaceAccessTokenWithScope({
 	scope = '',
 	throwOnError = false,
 }: GetWorkspaceAccessTokenWithScopeParams): Promise<WorkspaceAccessTokenWithScope> {
-	const { workspaceRegistered } = await retrieveRegistrationStatus();
-
 	const tokenResponse = { token: '', expiresAt: new Date(), scope: '' };
+
+	if (isCloudDisabled()) {
+		return tokenResponse;
+	}
+
+	const { workspaceRegistered } = await retrieveRegistrationStatus();
 
 	if (!workspaceRegistered) {
 		return tokenResponse;

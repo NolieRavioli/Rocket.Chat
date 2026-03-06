@@ -10,6 +10,7 @@ import { notifyOnSettingChangedById } from '../../../../lib/server/lib/notifyLis
 import { settings } from '../../../../settings/server';
 import { supportedVersions as supportedVersionsFromBuild } from '../../../../utils/rocketchat-supported-versions.info';
 import { buildVersionUpdateMessage } from '../../../../version-check/server/functions/buildVersionUpdateMessage';
+import { isCloudDisabled } from '../../isCloudDisabled';
 import { generateWorkspaceBearerHttpHeader } from '../getWorkspaceAccessToken';
 import { supportedVersionsChooseLatest } from './supportedVersionsChooseLatest';
 import { updateAuditedBySystem } from '../../../../../server/settings/lib/auditedSettingUpdates';
@@ -104,6 +105,13 @@ const releaseEndpoint = process.env.OVERWRITE_INTERNAL_RELEASE_URL?.trim()
 	: 'https://releases.rocket.chat/v2/server/supportedVersions';
 
 const getSupportedVersionsFromCloud = async () => {
+	if (isCloudDisabled()) {
+		return {
+			success: false,
+			error: new Error('Cloud services disabled'),
+		} as const;
+	}
+
 	if (process.env.CLOUD_SUPPORTED_VERSIONS_TOKEN) {
 		return {
 			success: true,
@@ -142,6 +150,7 @@ const getSupportedVersionsToken = async (retry = 0) => {
 	 * return the token
 	 */
 	const [versionsFromLicense, cloudResponse] = await Promise.all([License.getLicense(), getSupportedVersionsFromCloud()]);
+	const cloudDisabled = isCloudDisabled();
 
 	const supportedVersions = await supportedVersionsChooseLatest(
 		supportedVersionsFromBuild,
@@ -174,8 +183,13 @@ const getSupportedVersionsToken = async (retry = 0) => {
 			break;
 	}
 
-	// to avoid a possibly wrong message, we only send the message if the cloud response was successful
-	if (cloudResponse.success) {
+	if (cloudDisabled) {
+		SystemLogger.info({
+			msg: 'Skipping supported versions refresh because cloud services are disabled',
+		});
+		await buildVersionUpdateMessage(supportedVersions?.versions);
+	} else if (cloudResponse.success) {
+		// to avoid a possibly wrong message, we only send the message if the cloud response was successful
 		await buildVersionUpdateMessage(supportedVersions?.versions);
 	} else if (retry < 5) {
 		// in case of failure we'll try again later

@@ -1,6 +1,7 @@
 import type { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 
 import { getWorkspaceAccessToken } from '../../../../app/cloud/server';
+import { isCloudDisabled } from '../../../../app/cloud/server/isCloudDisabled';
 import { settings } from '../../../../app/settings/server';
 import { Info } from '../../../../app/utils/rocketchat.info';
 import { Apps } from '../orchestrator';
@@ -16,6 +17,10 @@ type MarketplaceNotificationType = 'install' | 'update' | 'uninstall';
  * @param appInfo - App metadata (including `id`, `name`, `nameSlug`, and `version`) to include in the notification
  */
 export async function notifyMarketplace(action: MarketplaceNotificationType, appInfo: IAppInfo): Promise<void> {
+	if (isCloudDisabled()) {
+		return;
+	}
+
 	const headers: { Authorization?: string } = {};
 
 	try {
