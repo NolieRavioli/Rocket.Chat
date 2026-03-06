@@ -61,4 +61,8 @@ registration.yaml
 storybook-static
 development/tempo-data/
 
+# Self-signed certificates
+certs/
+traefik-tls.yml
+
 .env

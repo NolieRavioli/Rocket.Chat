@@ -21,6 +21,7 @@ services:
       traefik.http.services.rocketchat.loadbalancer.server.port: 3000
       traefik.http.routers.rocketchat.service: rocketchat
       traefik.http.routers.rocketchat.rule: PathPrefix(`/`)
+      traefik.http.routers.rocketchat.tls: true
 
   authorization-service:
     platform: linux/amd64
@@ -75,6 +76,7 @@ services:
       traefik.http.services.ddp-streamer-service.loadbalancer.server.port: 3000
       traefik.http.routers.ddp-streamer-service.service: ddp-streamer-service
       traefik.http.routers.ddp-streamer-service.rule: PathPrefix(`/websocket`) || PathPrefix(`/sockjs`)
+      traefik.http.routers.ddp-streamer-service.tls: true
 
   queue-worker-service:
     platform: linux/amd64
@@ -129,8 +131,12 @@ services:
     image: traefik:v3.6.6
     command:
       - --providers.docker=true
+      - --providers.file.filename=/traefik-tls.yml
       - '--serverstransport.maxidleconnsperhost=-1'
     ports:
       - 3000:80
+      - 3443:443
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./certs:/certs:ro
+      - ./traefik-tls.yml:/traefik-tls.yml:ro
