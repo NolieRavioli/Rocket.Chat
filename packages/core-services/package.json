@@ -26,7 +26,8 @@
 		"@rocket.chat/models": "workspace:^",
 		"@rocket.chat/rest-typings": "workspace:^",
 		"@rocket.chat/tracing": "workspace:^",
-		"@rocket.chat/ui-kit": "workspace:~"
+		"@rocket.chat/ui-kit": "workspace:~",
+		"sharp": "^0.33.5"
 	},
 	"devDependencies": {
 		"@rocket.chat/apps-engine": "workspace:^",
