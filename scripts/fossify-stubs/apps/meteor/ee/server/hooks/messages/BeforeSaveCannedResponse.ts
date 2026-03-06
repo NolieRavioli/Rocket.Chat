@@ -1,0 +1,15 @@
+import type { IMessage, IRoom, IUser } from '@rocket.chat/core-typings';
+
+export class BeforeSaveCannedResponse {
+	static enabled = false;
+
+	async replacePlaceholders({
+		message,
+	}: {
+		message: IMessage;
+		room: IRoom;
+		user: Pick<IUser, '_id' | 'username' | 'name' | 'emails' | 'language'>;
+	}): Promise<IMessage> {
+		return message;
+	}
+}

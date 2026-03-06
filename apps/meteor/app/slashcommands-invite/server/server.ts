@@ -1,9 +1,9 @@
 import { api, FederationMatrix, isMeteorError } from '@rocket.chat/core-services';
 import type { IUser, SlashCommandCallbackParams } from '@rocket.chat/core-typings';
-import { validateFederatedUsername } from '@rocket.chat/federation-matrix';
 import { Subscriptions, Users, Rooms } from '@rocket.chat/models';
 import { Meteor } from 'meteor/meteor';
 
+import { validateFederatedUsername } from '../../../server/lib/federation/validateFederatedUsername';
 import { i18n } from '../../../server/lib/i18n';
 import { FederationActions } from '../../../server/services/room/hooks/BeforeFederationActions';
 import { addUsersToRoomMethod, sanitizeUsername } from '../../lib/server/methods/addUsersToRoom';
