@@ -1,6 +1,18 @@
 # Generate self-signed certificate for Rocket.Chat
 Write-Host "Generating self-signed certificate..." -ForegroundColor Green
 
+# Check if .env exists
+if (!(Test-Path ".env")) {
+    Write-Host "⚠️  No .env file found. Creating from .env.example..." -ForegroundColor Yellow
+    if (Test-Path ".env.example") {
+        Copy-Item ".env.example" ".env"
+        Write-Host "✓ Created .env file" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Error: .env.example not found!" -ForegroundColor Red
+        exit 1
+    }
+}
+
 # Create certs directory if it doesn't exist
 New-Item -ItemType Directory -Force -Path ".\certs" | Out-Null
 
@@ -38,7 +50,7 @@ if ($LASTEXITCODE -eq 0) {
     Write-Host "Files created:" -ForegroundColor Cyan
     Write-Host "  - .\certs\private.key"
     Write-Host "  - .\certs\certificate.crt"
-    Write-Host "`nRun: docker-compose -f docker-compose-local.yml up" -ForegroundColor Yellow
+    Write-Host "`nRun: docker compose -f docker-compose-local.yml up" -ForegroundColor Yellow
 } else {
     Write-Host "Error generating certificate" -ForegroundColor Red
     exit 1

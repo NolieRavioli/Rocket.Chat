@@ -4,21 +4,27 @@ Simple setup for running Rocket.Chat with a self-signed certificate.
 
 ## Quick Start
 
-1. **Generate the certificate:**
+1. **Create your environment file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Generate the certificate:**
    ```powershell
    .\generate-cert.ps1
    ```
    Or if you're using Git Bash:
    ```bash
+   chmod +x generate-cert.sh
    ./generate-cert.sh
    ```
 
-2. **Start Rocket.Chat:**
+3. **Start Rocket.Chat:**
    ```bash
-   docker-compose -f docker-compose-local.yml up
+   docker compose -f docker-compose-local.yml up
    ```
 
-3. **Access Rocket.Chat:**
+4. **Access Rocket.Chat:**
    - HTTPS: https://localhost:3443
    - HTTP (still available): http://localhost:3000
 

@@ -3,6 +3,18 @@
 # Generate self-signed certificate for Rocket.Chat
 echo "Generating self-signed certificate..."
 
+# Check if .env exists
+if [ ! -f ".env" ]; then
+    echo "⚠️  No .env file found. Creating from .env.example..."
+    if [ -f ".env.example" ]; then
+        cp .env.example .env
+        echo "✓ Created .env file"
+    else
+        echo "❌ Error: .env.example not found!"
+        exit 1
+    fi
+fi
+
 # Create certs directory if it doesn't exist
 mkdir -p ./certs
 
@@ -17,4 +29,4 @@ echo "Files created:"
 echo "  - ./certs/private.key"
 echo "  - ./certs/certificate.crt"
 echo ""
-echo "Run: docker-compose -f docker-compose-local.yml up"
+echo "Run: docker compose -f docker-compose-local.yml up"
